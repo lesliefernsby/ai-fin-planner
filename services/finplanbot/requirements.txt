@@ -1,0 +1,5 @@
+# requirements.txt — Python libraries your bot needs
+
+python-telegram-bot
+openai
+pillow
