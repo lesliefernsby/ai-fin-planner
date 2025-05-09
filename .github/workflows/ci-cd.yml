@@ -43,7 +43,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USER }}/finplanbot:latest
 
-    deploy:
+  deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
