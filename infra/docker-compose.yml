@@ -1,0 +1,7 @@
+version: "3.8"
+services:
+  finplanbot:
+    build: ../services/finplanbot
+    env_file:
+      - ../.env           # local secrets (gitignored)
+    restart: unless-stopped
