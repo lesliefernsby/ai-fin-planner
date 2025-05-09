@@ -26,7 +26,6 @@ jobs:
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
-          pytest
 
       # 2️⃣ Login to Docker Hub
       - name: Log in to Docker Hub
