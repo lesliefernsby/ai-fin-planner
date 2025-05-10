@@ -1,7 +1,12 @@
-version: "3.8"
 services:
   finplanbot:
-    build: ../services/finplanbot
+    build:
+      context: ../services/finplanbot
+    image: finplanbot:latest           
+    container_name: finplan-bot
     env_file:
-      - ../.env           # local secrets (gitignored)
+      - ../.env
+    volumes:
+      - ../services/finplanbot:/app
     restart: unless-stopped
+
