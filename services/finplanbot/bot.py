@@ -4,11 +4,20 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from PIL import Image
 from io import BytesIO
+import yaml
+import json
+from pathlib import Path
 
-# ─────────────── Debug Start ───────────────
-print("DEBUG: starting bot.py", flush=True)
+with open(Path(__file__).parent / "config" / "prompts.yaml") as f:
+    PROMPTS = yaml.safe_load(f)
 
-# Load environment variables
+CONFIG_DIR = Path(__file__).parent / "config"
+SCHEMA = json.loads((CONFIG_DIR / "receipt_schema.json").read_text(encoding="utf-8"))
+SCHEMA_STR = json.dumps(SCHEMA, indent=2)
+
+sys_msg = PROMPTS["receipt_extraction"]["system"]
+usr_msg = PROMPTS["receipt_extraction"]["user"]
+# ─────────────── Environment Variables ───────────────
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 
@@ -49,33 +58,20 @@ async def handle_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Resize and encode
     img_b64 = resize_image_bytes(img_bytes)
 
-    # Build the chat messages using the provided approach
     messages = [
         {
             "role": "system",
-            "content": (
-                "You are a specialized OCR assistant designed to extract structured information from receipts. "
-                "Carefully extract the following fields from the receipt image: "
-                "- Store Name\n"
-                "- Date (format as YYYY-MM-DD if available)\n"
-                "- Total Amount\n"
-                "- List of Items Purchased (including item name and price)\n\n"
-                "If any of these fields are not present, indicate them as 'N/A'. "
-                "Output the extracted information in JSON format. "
-                "Ensure the JSON is well-structured and valid. "
-                "Categorize the receipt into a category like 'Groceries', 'Electronics', etc., if possible. "
-            )
+            "content": f"{sys_msg}\n\n{SCHEMA_STR}"
         },
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": "extract the data from this receipt and output into JSON"},
+                {"type": "text", "text": usr_msg},
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}", "detail": "high"}}
             ]
         }
     ]
 
-    # Call OpenAI with the up-to-date namespaced method
     resp = openai.chat.completions.create(
         model="gpt-4.1-mini",
         messages=messages

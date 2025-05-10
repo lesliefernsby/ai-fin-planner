@@ -3,3 +3,5 @@
 python-telegram-bot
 openai
 pillow
+yaml
+json
