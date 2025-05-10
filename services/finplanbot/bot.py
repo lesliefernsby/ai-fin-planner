@@ -72,6 +72,10 @@ async def handle_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     ]
 
+    # Debugging: print the messages
+    print("DEBUG: messages", flush=True)
+    print(json.dumps(messages, indent=2), flush=True)
+
     resp = openai.chat.completions.create(
         model="gpt-4.1-mini",
         messages=messages
