@@ -48,9 +48,9 @@ jobs:
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
           script: |
             if [ ! -d /opt/finplan/.git ]; then
-              git clone https://github.com/<your-org>/ai-fin-planner.git /opt/finplan
+              git clone https://github.com/lesliefernsby/ai-fin-planner.git /opt/finplan
             fi
-            
+
             cd /opt/finplan/infra
 
             # Load your production env so Compose interpolation works
