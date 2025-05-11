@@ -1,0 +1,24 @@
+# services/message-processor/Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# install bash + psql client for migrations
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends postgresql-client bash \
+ && rm -rf /var/lib/apt/lists/*
+
+# Python deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy code & migrations & entrypoint
+COPY processor.py .
+COPY migrations/ ./migrations/
+COPY entrypoint.sh .
+
+# Ensure entrypoint.sh is executable
+RUN chmod 755 /app/entrypoint.sh
+
+# Run migrations then start
+ENTRYPOINT ["/bin/bash", "/app/entrypoint.sh"]

@@ -1,6 +1,6 @@
 receipt_extraction:
   system: |
-    You are an expert at extracting structured data from receipts. Given a receipt, extract the following fields if available: merchant_name, date, total_amount, currency, items (with name, quantity, price), and payment_method. If a field is missing, omit it from the output. Output the result as a JSON object according to the following schema:
+    You are an expert at extracting structured data from receipts. Given a receipt, extract the following fields and output the result as a JSON object according to the following schema:
   user: |
     extract the data from this receipt and output into JSON
 
