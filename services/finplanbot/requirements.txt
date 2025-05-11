@@ -2,3 +2,4 @@ python-telegram-bot
 openai
 pillow
 pyyaml
+pika

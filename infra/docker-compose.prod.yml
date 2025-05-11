@@ -6,6 +6,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    env_file:
+      - /etc/mybot.env
     environment:
       RABBITMQ_DEFAULT_VHOST: finplanbot
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
@@ -21,10 +23,9 @@ services:
     image: finplanbot:latest
     container_name: finplan-bot
     env_file:
-      - ../.env
+      - /etc/mybot.env
     volumes:
       - ../services/finplanbot:/app
-      - ../.env:/app/.env:ro
     depends_on:
       - rabbitmq
     restart: unless-stopped

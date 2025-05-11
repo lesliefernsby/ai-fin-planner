@@ -7,6 +7,19 @@ from io import BytesIO
 import yaml
 import json
 from pathlib import Path
+import pika
+
+RABBITMQ_URL = os.getenv("RABBITMQ_URL")
+if not RABBITMQ_URL:
+    print("ERROR: RABBITMQ_URL is not set!", flush=True)
+    sys.exit(1)
+
+# One connection/channel per process
+params  = pika.URLParameters(RABBITMQ_URL)
+conn    = pika.BlockingConnection(params)
+channel = conn.channel()
+# Declare a durable queue named "receipt_queue"
+channel.queue_declare(queue="receipt_queue", durable=True)
 
 with open(Path(__file__).parent / "config" / "prompts.yaml") as f:
     PROMPTS = yaml.safe_load(f)
@@ -81,6 +94,28 @@ async def handle_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         messages=messages
     )
     text = resp.choices[0].message.content.strip()
+
+
+    try:
+        receipt_json = json.loads(text)
+    except json.JSONDecodeError:
+        receipt_json = {"raw": text}
+
+    payload = {
+        "user": {
+            "id": update.effective_user.id,
+            "username": update.effective_user.username
+        },
+        "receipt": receipt_json
+    }
+    channel.basic_publish(
+        exchange="",
+        routing_key="receipt_queue",
+        body=json.dumps(payload),
+        properties=pika.BasicProperties(
+            delivery_mode=2  # make message persistent
+        )
+    )
 
     # Reply with the extracted JSON
     await update.message.reply_text(f"<pre>{text}</pre>", parse_mode="HTML")
