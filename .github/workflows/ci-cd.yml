@@ -53,21 +53,16 @@ jobs:
 
             cd /opt/finplan/infra
 
-            # Load your production env so Compose interpolation works
             set -o allexport
             source /etc/mybot.env
             set +o allexport
 
-            # Pull latest Compose & code
             git pull origin main
 
-            # Tear down old containers
-            docker-compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml down
 
-            # Rebuild the bot image & start services
-            docker-compose -f docker-compose.prod.yml \
+            docker compose -f docker-compose.prod.yml \
                            up -d --build
 
-            # Show status
-            docker-compose -f docker-compose.prod.yml \
+            docker compose -f docker-compose.prod.yml \
                            ps
