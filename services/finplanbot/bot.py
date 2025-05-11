@@ -102,6 +102,10 @@ async def handle_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "id": update.effective_user.id,
             "username": update.effective_user.username
         },
+        "action": "receipt_extraction",
+        "operation": "spending",
+        "total_amount": receipt_json.get("total_amount"),
+        "date": receipt_json.get("date"),
         "receipt": receipt_json
     }
     channel.basic_publish(

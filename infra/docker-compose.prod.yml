@@ -29,5 +29,17 @@ services:
     depends_on:
       - rabbitmq
     restart: unless-stopped
+  message-processor:
+    build:
+      context: ../services/message-processor
+    image: message-processor:latest
+    container_name: message-processor
+    env_file:
+      - /etc/mybot.env   
+    extra_hosts:
+      - "host.docker.internal:host-gateway"       
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
 volumes:
   rabbitmq_data:

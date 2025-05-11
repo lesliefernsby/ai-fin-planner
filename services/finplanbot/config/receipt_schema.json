@@ -1,14 +1,15 @@
 {
-    "Store Name": "",
-    "Date": "YYYY-MM-DD",
-    "Total Amount": "",
-    "Items": [
+    "store_name": "",
+    "date": "YYYY-MM-DD",
+    "total_amount": "",
+    "items": [
       {
         "name": "",
+        "quantity": "",
         "price": ""
       }
     ],
-    "Category": "",
-    "Payment Method": ""
+    "category": "",
+    "payment_method": ""
   }
   

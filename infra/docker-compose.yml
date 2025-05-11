@@ -1,5 +1,17 @@
 
 services:
+  db:
+    image: postgres:15
+    container_name: finplan-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
   rabbitmq:
     image: rabbitmq:3.11-management
     container_name: rabbitmq
@@ -28,5 +40,21 @@ services:
     depends_on:
       - rabbitmq
     restart: unless-stopped
+  message-processor:
+    build:
+      context: ../services/message-processor
+    image: message-processor:latest
+    container_name: message-processor
+    env_file:
+      - ../.env
+    volumes:
+      - ../services/message-processor:/app
+      - ../.env:/app/.env:ro         
+    depends_on:
+      - rabbitmq
+      - db
+    restart: unless-stopped
+  
 volumes:
+  db_data:
   rabbitmq_data:
