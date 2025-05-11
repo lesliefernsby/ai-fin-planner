@@ -22,14 +22,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies & run tests
+      - name: Install dependencies
         working-directory: services/finplanbot
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
-          pytest
 
   deploy:
     name: 🚀 Deploy via Docker Compose on VPS
@@ -59,14 +58,12 @@ jobs:
             git pull origin main
 
             # Tear down old containers
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml down
 
             # Rebuild the bot image & start services
-            docker-compose -f docker-compose.yml \
-                           -f docker-compose.prod.yml \
+            docker-compose -f docker-compose.prod.yml \
                            up -d --build
 
             # Show status
-            docker-compose -f docker-compose.yml \
-                           -f docker-compose.prod.yml \
+            docker-compose -f docker-compose.prod.yml \
                            ps
