@@ -43,23 +43,24 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USER }}/finplanbot:latest
 
   deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22                 
-          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
-          script: |
-            docker pull ${{ secrets.DOCKERHUB_USER }}/finplanbot:latest
-            docker stop finplan-bot || true
-            docker rm finplan-bot || true
-            docker run -d \
-              --name finplan-bot \
-              --restart unless-stopped \
-              --env-file /etc/mybot.env \
-              ${{ secrets.DOCKERHUB_USER }}/finplanbot:latest
+    - name: Deploy to VPS via SSH
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host:        ${{ secrets.VPS_HOST }}
+        username:    ${{ secrets.VPS_USER }}
+        key:         ${{ secrets.VPS_SSH_KEY }}
+        known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+        script: |
+          cd /opt/finplan/infra
+
+          # load secrets for interpolation
+          set -o allexport
+          source /etc/mybot.env
+          set +o allexport
+
+          git pull origin main
+
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps
